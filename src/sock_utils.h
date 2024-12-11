@@ -22,12 +22,11 @@ int set_sock_nonblock(int sockfd);
 int nonblock_connect(const struct sockaddr *addr, socklen_t len);
 
 /**
- * Connect to a domain using the specified port.
+ * Connect to a hostname using the specified port.
  * @param domain The domain name to connect to.
  * @param port The port number to connect to.
  * @param secure Indicates whether to use a secure connection (1 for secure, 0 for insecure).
- * @return 0 on success, -1 on error (with errno set).
  */
-int domain_connect(const char* domain, unsigned short port, char secure);
+int hostname_connect(const char* hostname, unsigned short port);
 
 #endif // SOCK_UTILS_H

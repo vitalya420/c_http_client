@@ -8,8 +8,14 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 set(SOURCES
     src/main.c
     src/parser.c
+    src/http.c
+    src/sock_utils.c
 )
 
+find_package(OpenSSL REQUIRED)
+
 add_executable(runme ${SOURCES})
+
+target_link_libraries(runme PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 target_include_directories(runme PRIVATE src)

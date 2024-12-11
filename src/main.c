@@ -12,6 +12,8 @@
 #include <sys/select.h>
 
 #include "parser.h"
+#include "http.h"
+
 
 #define h_addr h_addr_list[0]
 
@@ -94,95 +96,16 @@ int domain_connect(const char* domain, unsigned short port){
 
 
 
-http_connection* http_connect(const char* domain, unsigned short port, unsigned short secure){
-    http_connection* conn = malloc(sizeof(http_connection));
-    if (conn == NULL) {
-        perror("Failed to allocate memory for connection");
-        return NULL;
-    }
-
-    struct hostent* host = gethostbyname(domain);
-    if (host == NULL) {
-        perror("Failed to resolve hostname");
-        free(conn);
-        return NULL;
-    }
-
-    conn->socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (conn->socket_fd < 0) {
-        perror("Failed to create socket");
-        free(conn);
-        return NULL;
-    }
-
-    memset(&conn->server_addr, 0, sizeof(conn->server_addr));
-    conn->server_addr.sin_family = AF_INET;
-    conn->server_addr.sin_port = htons(port);
-    memcpy(&conn->server_addr.sin_addr, host->h_addr, host->h_length);
-
-    if (connect(conn->socket_fd, (struct sockaddr*)&conn->server_addr, sizeof(conn->server_addr)) < 0) {
-        perror("Failed to connect to server");
-        close(conn->socket_fd);
-        free(conn);
-        return NULL;
-    }
-    conn->is_secure = 0;
-
-    if(secure){
-
-        conn->is_secure = 1;
-    }
-
-    return conn;
-}
-
-
-int http_write(http_connection* conn, const void* request, size_t n){
-    return send(conn->socket_fd, request, n, 0);
-}
-
-void http_cleanup(http_connection* _http_connection){
-    free(_http_connection);
-}
-
-
-void async_connect(){
-    
-}
-
-
-void selector_event_loop(fd_set* write_fds, fd_set* read_fds){
-
-}
 
 int main(void){
 
     struct url_parsed* parsed = url_parse("https://httpbin.org");
 
+    
+    http_connect(parsed->domain, parsed->port, strcmp(parsed->proto, "https") == 0 ? 1 : 0);
 
-    int sockfd = domain_connect(parsed->domain, parsed->port);
-
-    if (sockfd < 0) {
-        fprintf(stderr, "Failed to connect to %s:%d\n", parsed->domain, parsed->port);
-        return EXIT_FAILURE;
-    }
-
-    printf("Connected to %s:%d\n", parsed->domain, parsed->port);
-
-    close(sockfd);
     url_parsed_free(parsed);
 
-    // const char* req = "GET /get HTTP/1.1\r\nHost: httpbin.org\r\n\r\n";
-    // printf("%s\n", req);
-    // http_connection* conn = http_connect("httpbin.org", 80, 0);
-    // if (conn == NULL){
-    //     printf("Error while connecting\n");
-    // }else{
-    //     printf("Connected!\n");
-    //     int sent = http_write(conn, req, strlen(req));
-    //     printf("%d\n", sent);
-    //     http_cleanup(conn);
 
-    // }
     return 0;
 }

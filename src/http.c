@@ -5,9 +5,12 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 
-
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+
+
+#include "http.h"
+#include "sock_utils.h"
 
 
 typedef struct {
@@ -43,7 +46,7 @@ static SSL_CTX* create_context() {
     return _ctx;
 }
 
-void http_connect(const char* host, unsigned short port, char secure){
+void http_connect(const char* host, unsigned short port, unsigned short secure){
     /*
         Connect to http server by domain.
         For example connect to httpbin.org
@@ -54,6 +57,9 @@ void http_connect(const char* host, unsigned short port, char secure){
 
         http_connect("httpbin.org", 443, 1);
     */
+
+   printf("Connect to %s %d %d\n", host, port, secure);
+   hostname_connect(host, port);
     
 }
 
